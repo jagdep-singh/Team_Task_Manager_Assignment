@@ -16,19 +16,23 @@ export default function TaskCard({
     setNodeRef,
     transform,
     transition,
+    isDragging,
   } = useSortable({
     id: String(task.id),
   });
 
   const style = {
-    transform: transform ? CSS.Transform.toString(transform) : undefined,
+    // Translate only (no scale) — prevents jitter during drag
+    transform: transform ? CSS.Translate.toString(transform) : undefined,
     transition,
+    opacity: isDragging ? 0.4 : 1,
+    zIndex: isDragging ? 999 : undefined,
+    position: isDragging ? ("relative" as const) : undefined,
   };
 
   const handlePriorityCycle = () => {
     const currentIndex = order.indexOf(task.priority);
     const next = order[(currentIndex + 1) % order.length];
-
     onPriorityChange(task.id, next);
   };
 
@@ -36,7 +40,7 @@ export default function TaskCard({
     <div
       ref={setNodeRef}
       style={style}
-      className="task-card"
+      className={`task-card${isDragging ? " task-card--dragging" : ""}`}
     >
       {/* DRAG HANDLE */}
       <div className="drag-handle" {...attributes} {...listeners}>

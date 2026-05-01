@@ -15,30 +15,33 @@ export default function Column({
   tasks,
   onPriorityChange,
 }: any) {
-  const { setNodeRef } = useDroppable({
+  const { setNodeRef, isOver } = useDroppable({
     id: status,
   });
 
   const safeTasks = Array.isArray(tasks) ? tasks : [];
 
   return (
-    <div className="column" ref={setNodeRef}>
+    <div className="column">
       <div className="column-header">
         <div className="column-header-top">
-            <div className="column-title">{title}</div>
-            <span className="column-count">{tasks.length}</span>
+          <div className="column-title">{title}</div>
+          <span className="column-count">{safeTasks.length}</span>
         </div>
-
         <div className="column-divider" />
-        </div>
+      </div>
 
       <SortableContext
         items={safeTasks.map((t: any) => String(t.id))}
         strategy={verticalListSortingStrategy}
       >
-        <div className="column-tasks">
+        {/* setNodeRef goes on the tasks container so the whole area is droppable */}
+        <div
+          ref={setNodeRef}
+          className={`column-tasks${isOver ? " column-tasks--over" : ""}`}
+        >
           {safeTasks.length === 0 ? (
-            <div className="column-empty">No tasks</div>
+            <div className="column-empty">Drop here</div>
           ) : (
             safeTasks.map((t: any) => (
               <TaskCard

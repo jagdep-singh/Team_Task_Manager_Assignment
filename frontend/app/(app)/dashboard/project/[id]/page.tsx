@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   DndContext,
-  closestCorners,
+  rectIntersection,
   PointerSensor,
   useSensor,
   useSensors,
@@ -333,7 +333,7 @@ export default function ProjectPage() {
         {/* BOARD */}
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCorners}
+          collisionDetection={rectIntersection}
           onDragEnd={handleDragEnd}
         >
           <div className="kanban">
