@@ -183,66 +183,84 @@ export default function ProjectPage() {
   };
 
   const handleDragEnd = async ({ active, over }: any) => {
-    if (!over) return;
+    try {
+      if (!over || !active) return;
 
-    const taskId = Number(active.id);
+      const taskId = Number(active.id);
+      if (isNaN(taskId)) return;
 
-    const taskStatusKeys = ["todo", "in_progress", "done"] as const;
-    type TaskStatus = (typeof taskStatusKeys)[number];
+      const taskStatusKeys = ["todo", "in_progress", "done"] as const;
+      type TaskStatus = (typeof taskStatusKeys)[number];
 
-    let newStatus: TaskStatus | undefined;
+      let newStatus: TaskStatus | undefined;
 
-    if (taskStatusKeys.includes(over.id as TaskStatus)) {
-      newStatus = over.id as TaskStatus;
-    } else {
-      newStatus = over.data?.current?.sortable?.containerId as TaskStatus | undefined;
-    }
+      if (taskStatusKeys.includes(over.id as TaskStatus)) {
+        newStatus = over.id as TaskStatus;
+      } else {
+        newStatus = over.data?.current?.sortable?.containerId as TaskStatus | undefined;
+      }
 
-    if (!newStatus) return;
+      if (!newStatus || !taskStatusKeys.includes(newStatus)) return;
 
-    setTasks((prev: any) => {
-      let moved: any = null;
-
-      const updated = {
-        todo: [...(prev.todo || [])],
-        in_progress: [...(prev.in_progress || [])],
-        done: [...(prev.done || [])],
-      };
-
+      // No-op if dropped in the same column
+      let currentStatus: TaskStatus | undefined;
       for (const key of taskStatusKeys) {
-        updated[key] = updated[key].filter((t: any) => {
-          if (t.id === taskId) {
-            moved = t;
-            return false;
-          }
-          return true;
-        });
+        if (tasks[key].some((t: any) => t.id === taskId)) {
+          currentStatus = key;
+          break;
+        }
       }
+      if (currentStatus === newStatus) return;
 
-      if (moved && newStatus) {
-        updated[newStatus].push({
-          ...moved,
-          status: newStatus,
-        });
-      }
+      // Capture in a local const so the closure inside setTasks is safe
+      const targetStatus = newStatus;
 
-      return updated;
-    });
+      setTasks((prev: any) => {
+        let moved: any = null;
 
-    const res = await moveTask(id, taskId, newStatus);
+        const updated = {
+          todo: [...(prev.todo || [])],
+          in_progress: [...(prev.in_progress || [])],
+          done: [...(prev.done || [])],
+        };
+
+        for (const key of taskStatusKeys) {
+          updated[key] = updated[key].filter((t: any) => {
+            if (t.id === taskId) {
+              moved = t;
+              return false;
+            }
+            return true;
+          });
+        }
+
+        if (moved) {
+          updated[targetStatus].push({ ...moved, status: targetStatus });
+        }
+
+        return updated;
+      });
+
+      const res = await moveTask(id, taskId, targetStatus);
 
       if (res?.error === "NOT_ALLOWED") {
-        setErrorMsg("You don’t have permission to move this task");
-        loadAll();
+        setErrorMsg("You don't have permission to move this task");
+        await loadAll();
         setTimeout(() => setErrorMsg(""), 2500);
         return;
       }
 
       if (res?.error) {
-        setErrorMsg("Something went wrong");
-        loadAll();
+        setErrorMsg("Something went wrong moving the task");
+        await loadAll();
         return;
       }
+    } catch (err: any) {
+      console.error("Error in handleDragEnd:", err);
+      setErrorMsg("Failed to move task");
+      await loadAll();
+      setTimeout(() => setErrorMsg(""), 2500);
+    }
   };
 
   const handleCreate = async () => {
