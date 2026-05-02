@@ -1,4 +1,7 @@
-fastapi==0.124.4
-fastapi-cli==0.0.16
-fastapi-cloud-cli==0.6.0
-uvicorn==0.38.0
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+python-jose
+passlib[bcrypt]
+python-dotenv
