@@ -35,4 +35,12 @@ def PingPong(msg : str):
 
 @app.get("/users")
 def get_users(db: Session = Depends(get_db)):
-    return db.query(User.id, User.name, User.email).all()
+    users = db.query(User.id, User.name, User.email).all()
+    return [
+            {
+                "id": u.id, 
+                "name": u.name, 
+                "email": u.email
+            } 
+        for u in users
+    ]
