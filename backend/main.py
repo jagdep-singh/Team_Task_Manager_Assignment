@@ -35,4 +35,4 @@ def PingPong(msg : str):
 
 @app.get("/users")
 def get_users(db: Session = Depends(get_db)):
-    return db.query(User).all()
+    return db.query(User.id, User.name, User.email).all()
