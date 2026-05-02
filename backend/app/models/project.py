@@ -5,6 +5,6 @@ class Project(Base):
     __tablename__ = "projects"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    created_by = Column(Integer)
-    #description = Column(String)
+    project_name = Column(String, index=True)
+    created_by = Column(Integer , index = True)
+    description = Column(String)

@@ -43,9 +43,14 @@ async def login(user_data: UserLogin, db: DbSession):
     
     if verify_password(user_data.password, user.password):
         token = create_access_token(user.id)
-        return {"message": "Login successful",
+        return {
                 "token": token,
-                "token_type": "bearer"
-        }
+                "token_type": "bearer",
+                "user": {
+                    "id": user.id,
+                    "name": user.name,
+                    "email": user.email
+                }
+            }
     else:
         return {"message": "wrong password"}
