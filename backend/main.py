@@ -6,8 +6,18 @@ from app.models.user import User
 from app.routes.auth import router as auth_router
 from app.routes.projects import router as projects_router
 from app.utils.dependencies import get_current_user
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(auth_router , prefix="/auth") #auth.py
 app.include_router(projects_router , prefix="/project") #projects.py
 
