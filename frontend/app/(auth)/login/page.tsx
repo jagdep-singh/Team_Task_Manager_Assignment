@@ -29,17 +29,20 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
+    <div className="min-h-screen flex items-center justify-center bg-surface">
+      <div className="max-w-md w-full space-y-8 p-8 card">
         <div>
-          <h2 className="text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
+          <h2 className="text-center text-3xl font-bold text-main">
+            Welcome back
           </h2>
+          <p className="text-center text-subtext text-muted-foreground mt-2">
+            Sign in to your account
+          </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="sr-only">
+              <label htmlFor="email" className="block text-sm font-medium text-subtext mb-2">
                 Email address
               </label>
               <input
@@ -47,14 +50,14 @@ export default function Login() {
                 name="email"
                 type="email"
                 required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
+                className="input w-full"
+                placeholder="Enter your email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">
+              <label htmlFor="password" className="block text-sm font-medium text-subtext mb-2">
                 Password
               </label>
               <input
@@ -62,23 +65,35 @@ export default function Login() {
                 name="password"
                 type="password"
                 required
-                className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
+                className="input w-full"
+                placeholder="Enter your password"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
               />
             </div>
           </div>
 
-          {error && <div className="text-red-500 text-sm">{error}</div>}
+          {error && <div className="text-red-500 text-sm text-center">{error}</div>}
 
           <div>
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+              className="btn-primary w-full"
             >
               {loading ? "Signing in..." : "Sign in"}
+            </button>
+          </div>
+          <div className="text-center space-y-2">
+            <p className="text-sm text-muted-foreground">
+              Don’t have an account? Create one
+            </p>
+            <button
+              type="button"
+              onClick={() => router.push("/signup")}
+              className="btn-secondary w-full"
+            >
+              Create account
             </button>
           </div>
         </form>

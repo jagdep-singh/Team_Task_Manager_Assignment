@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+/* eslint-disable react-hooks/set-state-in-effect */
+
+import { useEffect, useState, useCallback } from "react";
 import { request } from "@/lib/api";
 import { useParams } from "next/navigation";
 import Link from "next/link";
@@ -21,11 +23,15 @@ import {
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
+type TaskStatus = "todo" | "in_progress" | "done";
+
+type TasksByStatus = Record<TaskStatus, Task[]>;
+
 interface Task {
   id: number;
   title: string;
   description: string;
-  status: string;
+  status: TaskStatus;
   priority: string;
   assigned_to: { id: number; name: string } | null;
   created_by: { id: number; name: string };
@@ -54,13 +60,14 @@ function SortableTask({ task }: { task: Task }) {
       style={style}
       {...attributes}
       {...listeners}
-      className="border border-gray-300 p-4 mb-2 bg-white rounded cursor-move hover:shadow-md transition-shadow"
+      className="card p-4 mb-3 cursor-move group"
     >
-      <p className="font-semibold">{task.title}</p>
-      <p className="text-sm text-gray-600">{task.description}</p>
-      <small className="text-xs text-gray-500">
-        Priority: {task.priority} | Assigned: {task.assigned_to?.name || "None"}
-      </small>
+      <p className="font-semibold text-main mb-2">{task.title}</p>
+      <p className="text-sm text-muted-foreground text-subtext mb-3 line-clamp-2">{task.description}</p>
+      <div className="flex items-center justify-between text-xs text-muted-foreground text-subtext">
+        <span className="capitalize">Priority: {task.priority}</span>
+        <span>Assigned: {task.assigned_to?.name || "None"}</span>
+      </div>
     </div>
   );
 }
@@ -71,15 +78,20 @@ function DroppableColumn({ id, title, tasks }: { id: string; title: string; task
   return (
     <div
       ref={setNodeRef}
-      className={`flex-1 h-96 border border-gray-300 rounded p-4 bg-gray-50 overflow-y-auto ${
-        isOver ? 'bg-blue-50 border-blue-300' : ''
+      className={`flex-1 min-h-96 card p-4 overflow-y-auto transition-colors ${
+        isOver ? 'bg-blue-50 border-blue-300 shadow-clean-lg' : ''
       }`}
     >
-      <h2 className="font-bold mb-4 sticky top-0 bg-gray-50 pb-2">{title}</h2>
+      <h2 className="font-bold text-main mb-4 sticky top-0 bg-surface pb-2 text-lg">{title}</h2>
       <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
         {tasks.map((task) => (
           <SortableTask key={task.id} task={task} />
         ))}
+        {tasks.length === 0 && (
+          <div className="text-center py-8 text-muted-foreground text-subtext">
+            No tasks yet
+          </div>
+        )}
       </SortableContext>
     </div>
   );
@@ -87,7 +99,7 @@ function DroppableColumn({ id, title, tasks }: { id: string; title: string; task
 
 export default function ProjectPage() {
   const { id } = useParams();
-  const [tasks, setTasks] = useState<{ [key: string]: Task[] } | null>(null);
+  const [tasks, setTasks] = useState<TasksByStatus | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
@@ -104,7 +116,7 @@ export default function ProjectPage() {
     })
   );
 
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     try {
       const res = await request(`/project/${id}/tasks`);
       setTasks(typeof res === 'object' && res !== null ? res : { todo: [], in_progress: [], done: [] });
@@ -112,9 +124,9 @@ export default function ProjectPage() {
       console.error("Failed to fetch tasks:", error);
       setTasks({ todo: [], in_progress: [], done: [] });
     }
-  };
+  }, [id]);
 
-  const fetchMembers = async () => {
+  const fetchMembers = useCallback(async () => {
     try {
       const res = await request(`/project/${id}/members`);
       setMembers(Array.isArray(res) ? res : []);
@@ -122,12 +134,12 @@ export default function ProjectPage() {
       console.error("Failed to fetch members:", error);
       setMembers([]);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     fetchTasks();
     fetchMembers();
-  }, [id]);
+  }, [fetchTasks, fetchMembers]);
 
   const createTask = async () => {
     if (!title) return;
@@ -150,7 +162,8 @@ export default function ProjectPage() {
       }
     } catch (error) {
       console.error("Failed to create task:", error);
-      alert("Failed to create task");
+      setError("Failed to create task");
+      setTimeout(() => setError(""), 5000);
     }
     setLoading(false);
   };
@@ -164,11 +177,13 @@ export default function ProjectPage() {
         setEmail("");
         fetchMembers();
       } else {
-        alert(res.message || "Failed to add member");
+        setError(res.message || "Failed to add member");
+        setTimeout(() => setError(""), 5000);
       }
     } catch (error) {
       console.error("Failed to add member:", error);
-      alert("Failed to add member");
+      setError("Failed to add member");
+      setTimeout(() => setError(""), 5000);
     }
     setLoading(false);
   };
@@ -180,11 +195,13 @@ export default function ProjectPage() {
       if (res.message) {
         fetchMembers();
       } else {
-        alert("Failed to remove member");
+        setError("Failed to remove member");
+        setTimeout(() => setError(""), 5000);
       }
     } catch (error) {
       console.error("Failed to remove member:", error);
-      alert("Failed to remove member");
+      setError("Failed to remove member");
+      setTimeout(() => setError(""), 5000);
     }
     setLoading(false);
   };
@@ -192,33 +209,56 @@ export default function ProjectPage() {
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     console.log('Drag end:', { active: active.id, over: over?.id });
-    if (!over) return;
+    if (!over || !tasks) return;
 
     const taskId = active.id as number;
-    const newStatus = over.id as string;
+    const newStatus = over.id as string as TaskStatus;
+    const validStatuses: TaskStatus[] = ["todo", "in_progress", "done"];
+
+    if (!validStatuses.includes(newStatus)) {
+      console.warn(`Ignored invalid status: ${newStatus}`);
+      return;
+    }
 
     // Find current status
-    let currentStatus = "";
+    let currentStatus: TaskStatus | null = null;
     let taskToMove: Task | null = null;
-    for (const status in tasks) {
-      const task = tasks[status].find(t => t.id === taskId);
+
+    for (const status of validStatuses) {
+      const task = tasks[status].find((t) => t.id === taskId);
       if (task) {
         currentStatus = status;
         taskToMove = task;
         break;
       }
     }
+
     console.log('Status change:', { taskId, currentStatus, newStatus });
 
-    if (currentStatus === newStatus || !taskToMove) return;
+    if (!currentStatus || currentStatus === newStatus || !taskToMove) return;
 
-    // Optimistic update: immediately move the task
-    const updatedTasks = { ...tasks };
-    updatedTasks[currentStatus] = updatedTasks[currentStatus].filter(t => t.id !== taskId);
-    updatedTasks[newStatus] = [...updatedTasks[newStatus], { ...taskToMove, status: newStatus }];
+    if (currentStatus === "done") {
+      setError("Cannot move tasks out of 'Done' status");
+      setTimeout(() => setError(""), 3000);
+      return;
+    }
+
+    const updatedTasks: TasksByStatus = {
+      todo: [...tasks.todo],
+      in_progress: [...tasks.in_progress],
+      done: [...tasks.done],
+    };
+
+    updatedTasks[currentStatus] = updatedTasks[currentStatus].filter((t) => t.id !== taskId);
+    updatedTasks[newStatus] = [
+      ...updatedTasks[newStatus],
+      { ...taskToMove, status: newStatus },
+    ];
+
     setTasks(updatedTasks);
 
     try {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       const res = await request(`/project/${id}/tasks/${taskId}`, "PATCH", { status: newStatus });
       if (!res.id) {
         // Revert on failure
@@ -235,110 +275,133 @@ export default function ProjectPage() {
     }
   };
 
-  if (!tasks) return <div className="p-4">Loading...</div>;
+  if (!tasks) return (
+    <div className="min-h-screen bg-surface flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-foreground mx-auto mb-4"></div>
+        <p className="text-muted-foreground text-subtext">Loading project...</p>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="p-4">
-      {loading && <div className="mb-4 text-blue-500">Loading...</div>}
-      {error && <div className="mb-4 text-red-500 bg-red-100 p-2 rounded">{error}</div>}
+    <div className="min-h-screen bg-surface p-6">
+      <div className="max-w-7xl mx-auto">
+        {loading && <div className="mb-4 text-blue-500 text-subtext">Loading...</div>}
+        {error && <div className="mb-4 text-red-500 bg-red-50 border border-red-200 p-3 rounded-lg text-subtext">{error}</div>}
 
-      <div className="mb-4">
-        <Link href="/dashboard" className="text-blue-500 hover:text-blue-700">
-          ← Back to Projects
-        </Link>
-      </div>
-
-      {/* Members */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-4">Project Members</h1>
-        <div className="mb-4">
-          <input
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="border border-gray-300 p-2 mr-2"
-          />
-          <button onClick={addMember} className="bg-blue-500 text-white px-4 py-2 rounded">
-            Add Member
-          </button>
+        <div className="mb-6">
+          <Link href="/dashboard" className="text-blue-600 hover:text-blue-800 text-subtext font-medium flex items-center gap-2">
+            ← Back to Projects
+          </Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {members.map((member) => (
-            <div key={member.id} className="border border-gray-300 p-4 rounded bg-white">
-              <p className="font-semibold">{member.name}</p>
-              <p className="text-sm text-gray-600">{member.email}</p>
-              <p className="text-xs text-gray-500">Role: {member.role}</p>
-              <button
-                onClick={() => removeMember(member.id)}
-                className="mt-2 bg-red-500 text-white px-2 py-1 rounded text-sm"
-              >
-                Remove
+
+        {/* Members */}
+        <div className="card p-6 mb-8">
+          <h1 className="text-3xl font-bold text-main mb-6">Project Members</h1>
+          <div className="mb-6">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                placeholder="Enter member email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="input flex-1"
+              />
+              <button onClick={addMember} className="btn-primary whitespace-nowrap">
+                Add Member
               </button>
             </div>
-          ))}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {members.map((member) => (
+              <div key={member.id} className="card p-4">
+                <p className="font-semibold text-main mb-1">{member.name}</p>
+                <p className="text-sm text-muted-foreground text-subtext mb-2">{member.email}</p>
+                <p className="text-xs text-muted-foreground text-subtext capitalize mb-3">Role: {member.role}</p>
+                <button
+                  onClick={() => removeMember(member.id)}
+                  className="btn-secondary text-red-600 hover:text-red-700 hover:bg-red-50 w-full"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+            {members.length === 0 && (
+              <div className="col-span-full text-center py-8 text-muted-foreground text-subtext">
+                No members added yet
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Tasks */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-4">Tasks</h1>
-        <div className="mb-4">
-          <input
-            placeholder="Task title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="border border-gray-300 p-2 mr-2"
-          />
-          <input
-            placeholder="Description"
-            value={desc}
-            onChange={(e) => setDesc(e.target.value)}
-            className="border border-gray-300 p-2 mr-2"
-          />
-          <button onClick={createTask} className="bg-green-500 text-white px-4 py-2 rounded">
-            Add Task
-          </button>
-        </div>
-      </div>
-
-      {/* Kanban */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={rectIntersection}
-        onDragStart={(event) => {
-          const taskId = event.active.id as number;
-          for (const status in tasks) {
-            const task = tasks[status].find(t => t.id === taskId);
-            if (task) {
-              setActiveTask(task);
-              break;
-            }
-          }
-        }}
-        onDragEnd={(event) => {
-          setActiveTask(null);
-          handleDragEnd(event);
-        }}
-      >
-        <div className="flex gap-4 h-96">
-          {["todo", "in_progress", "done"].map((col) => (
-            <DroppableColumn
-              key={col}
-              id={col}
-              title={col.replace("_", " ").toUpperCase()}
-              tasks={tasks[col] || []}
-            />
-          ))}
-        </div>
-        <DragOverlay>
-          {activeTask ? (
-            <div className="border border-gray-300 p-4 bg-white rounded shadow-lg rotate-3">
-              <p className="font-semibold">{activeTask.title}</p>
-              <p className="text-sm text-gray-600">{activeTask.description}</p>
+        {/* Tasks */}
+        <div className="card p-6 mb-8">
+          <h1 className="text-3xl font-bold text-main mb-6">Tasks</h1>
+          <div className="mb-6">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                placeholder="Task title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="input flex-1"
+              />
+              <input
+                placeholder="Task description"
+                value={desc}
+                onChange={(e) => setDesc(e.target.value)}
+                className="input flex-1"
+              />
+              <button onClick={createTask} className="btn-primary whitespace-nowrap">
+                Add Task
+              </button>
             </div>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+          </div>
+        </div>
+
+        {/* Kanban Board */}
+        <div className="card p-6">
+          <h1 className="text-3xl font-bold text-main mb-6">Kanban Board</h1>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={rectIntersection}
+            onDragStart={(event) => {
+              if (!tasks) return;
+              const taskId = event.active.id as number;
+              const validStatuses: TaskStatus[] = ["todo", "in_progress", "done"];
+              for (const status of validStatuses) {
+                const task = tasks[status].find((t) => t.id === taskId);
+                if (task) {
+                  setActiveTask(task);
+                  break;
+                }
+              }
+            }}
+            onDragEnd={(event) => {
+              setActiveTask(null);
+              handleDragEnd(event);
+            }}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 min-h-96">
+              {(["todo", "in_progress", "done"] as TaskStatus[]).map((col) => (
+                <DroppableColumn
+                  key={col}
+                  id={col}
+                  title={col.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                  tasks={tasks[col] || []}
+                />
+              ))}
+            </div>
+            <DragOverlay>
+              {activeTask ? (
+                <div className="card p-4 shadow-clean-xl rotate-3 bg-surface">
+                  <p className="font-semibold text-main">{activeTask.title}</p>
+                  <p className="text-sm text-muted-foreground text-subtext mt-1">{activeTask.description}</p>
+                </div>
+              ) : null}
+            </DragOverlay>
+          </DndContext>
+        </div>
+      </div>
     </div>
   );
 }

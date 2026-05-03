@@ -3,7 +3,7 @@ const API = process.env.NEXT_PUBLIC_API_URL;
 export const request = async (
   endpoint: string,
   method: string = "GET",
-  body?: any
+  body?: unknown
 ) => {
   const token = localStorage.getItem("token");
 

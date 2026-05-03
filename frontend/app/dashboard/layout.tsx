@@ -17,7 +17,7 @@ export default function DashboardLayout({
     if (!token) {
       router.push("/login");
     }
-  }, []);
+  }, [router]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
