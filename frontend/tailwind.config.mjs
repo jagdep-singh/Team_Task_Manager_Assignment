@@ -1,4 +1,4 @@
-import { fontFamily } from 'tailwindcss/defaultTheme';
+import defaultTheme from 'tailwindcss/defaultTheme';
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -17,8 +17,8 @@ export default {
         'apple-blue': '#0071E3',
       },
       fontFamily: {
-        sans: ['Satoshi', ...fontFamily.sans],
-        mono: ['JetBrains Mono', ...fontFamily.mono],
+        sans: ['Satoshi', ...defaultTheme.fontFamily.sans],
+        mono: ['JetBrains Mono', ...defaultTheme.fontFamily.mono],
       },
       boxShadow: {
         sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
