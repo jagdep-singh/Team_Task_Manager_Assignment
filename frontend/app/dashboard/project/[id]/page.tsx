@@ -360,7 +360,7 @@ export default function ProjectPage() {
 
         {/* Kanban Board */}
         <div className="card p-6">
-          <h1 className="text-3xl font-bold text-main mb-6">Kanban Board</h1>
+          <h1 className="text-3xl font-bold text-main mb-6">TASKS</h1>
           <DndContext
             sensors={sensors}
             collisionDetection={rectIntersection}
