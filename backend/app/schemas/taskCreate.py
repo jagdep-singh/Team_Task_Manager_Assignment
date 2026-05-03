@@ -1,3 +1,6 @@
+from datetime import datetime
+from typing import Optional
+
 from pydantic import BaseModel
 from app.models.tasks import Priority, Status
 
@@ -7,6 +10,7 @@ class TaskCreate(BaseModel):
     priority: Priority = Priority.medium
     status: Status = Status.todo
     assigned_to: int | None = None
+    due_date: Optional[datetime] = None
 
     class Config:
         from_attributes = True

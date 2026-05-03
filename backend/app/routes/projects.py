@@ -22,6 +22,7 @@ def build_task_response(t , db : DbSession):
         "description": t.description,
         "status": t.status.value,
         "priority": t.priority.value,
+        "due_date": t.due_date,
         "assigned_to": {
             "id": assigned_user.id,
             "name": assigned_user.name
@@ -281,14 +282,15 @@ async def create_task(
             raise HTTPException(status_code=400, detail="User is not part of this project.")
 
     new_task = Task(
-                project_id=project_id,
-                title=task_data.title,
-                description=task_data.description,
-                priority=task_data.priority,
-                status=task_data.status,
-                assigned_to=task_data.assigned_to,
-                created_by=user_id
-            )
+            project_id=project_id,
+            title=task_data.title,
+            description=task_data.description,
+            priority=task_data.priority,
+            status=task_data.status,
+            assigned_to=task_data.assigned_to,
+            created_by=user_id,
+            due_date=task_data.due_date
+        )
 
     db.add(new_task)
     db.commit()

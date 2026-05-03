@@ -1,5 +1,7 @@
 
+
 from sqlalchemy import Column, Integer, String, Enum as SQLAlchemyEnum
+from datetime import datetime
 from app.db import Base
 from enum import Enum
 
@@ -26,3 +28,4 @@ class Task(Base):
     status = Column(SQLAlchemyEnum(Status), default=Status.todo)
     priority = Column(SQLAlchemyEnum(Priority), default=Priority.medium)
     assigned_to = Column(Integer, nullable=True, index=True)
+    due_date = Column(datetime, nullable=True)
