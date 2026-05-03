@@ -322,7 +322,8 @@ async def update_task_status(
     
     if not (
             task.assigned_to == user_id or
-            membership.role == RoleEnum.admin
+            membership.role == RoleEnum.admin or 
+            task.assigned_to is None
         ):
         raise HTTPException(status_code=403, detail="Not allowed to update this task.")
 
