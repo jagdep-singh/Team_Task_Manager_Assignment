@@ -14,7 +14,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://task-manager-jazz.vercel.app",
-        "https://*.vercel.app"
+        "https://*.vercel.app",
+        "http://localhost:3000"
     ],
     allow_credentials=True,
     allow_methods=["*"],
