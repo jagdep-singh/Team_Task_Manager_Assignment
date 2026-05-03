@@ -29,77 +29,44 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-surface">
-      <div className="max-w-md w-full space-y-8 p-8 card">
-        <div>
-          <h2 className="text-center text-3xl font-bold text-main">
-            Create account
-          </h2>
-          <p className="text-center text-subtext text-muted-foreground mt-2">
-            Join us and start managing your projects
-          </p>
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="max-w-sm w-full p-8 bg-surface rounded-2xl shadow-md">
+        <h1 className="text-center font-mono text-xl font-bold mb-6">Ethara AI</h1>
+        <h2 className="text-center text-2xl font-semibold text-foreground mb-4">Create Account</h2>
+        <p className="text-center text-muted mb-6">Join us and start managing your projects</p>
+
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
+        <div className="space-y-4">
+          <input
+            type="text"
+            placeholder="Name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className="w-full p-3 border border-border rounded-xl focus:ring-2 focus:ring-apple-blue"
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            className="w-full p-3 border border-border rounded-xl focus:ring-2 focus:ring-apple-blue"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            className="w-full p-3 border border-border rounded-xl focus:ring-2 focus:ring-apple-blue"
+          />
+          <button
+            onClick={handleSignup}
+            disabled={loading}
+            className="w-full p-3 bg-foreground text-white rounded-full font-medium hover:bg-opacity-90 transition-all"
+          >
+            {loading ? "Creating account..." : "Sign Up"}
+          </button>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={(e) => { e.preventDefault(); handleSignup(); }}>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-subtext mb-2">
-                Full name
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                className="input w-full"
-                placeholder="Enter your full name"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-subtext mb-2">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="input w-full"
-                placeholder="Enter your email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-subtext mb-2">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="input w-full"
-                placeholder="Create a password"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-              />
-            </div>
-          </div>
-
-          {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full"
-            >
-              {loading ? "Creating account..." : "Create account"}
-            </button>
-          </div>
-        </form>
       </div>
     </div>
   );
