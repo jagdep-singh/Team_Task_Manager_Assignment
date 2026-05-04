@@ -1,6 +1,8 @@
+from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+from sqlalchemy import func
 from app.db import DbSession
 
 from app.utils.dependencies import get_current_user
@@ -397,11 +399,34 @@ async def get_dashboard(
     in_progress_tasks = db.query(Task).filter(Task.project_id == project_id, Task.status == Status.in_progress).count()
     done_tasks = db.query(Task).filter(Task.project_id == project_id, Task.status == Status.done).count()
 
+    today = date.today()
+    overdue_tasks = db.query(Task).filter(
+        Task.project_id == project_id,
+        Task.due_date != None,
+        Task.due_date < today,
+        Task.status != Status.done
+    ).count()
+
+    tasks_per_user_rows = (
+        db.query(User.name, func.count(Task.id).label("count"))
+        .join(Task, Task.assigned_to == User.id)
+        .filter(Task.project_id == project_id)
+        .group_by(User.id, User.name)
+        .all()
+    )
+
+    tasks_per_user = [
+        {"name": row.name, "count": row.count}
+        for row in tasks_per_user_rows
+    ]
+
     return {
         "total_tasks": total_tasks,
         "by_status": {
             "todo": todo_tasks,
             "in_progress": in_progress_tasks,
             "done": done_tasks
-        }
+        },
+        "overdue_tasks": overdue_tasks,
+        "tasks_per_user": tasks_per_user
     }

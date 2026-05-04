@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   DndContext,
-  rectIntersection,
+  closestCorners,
   PointerSensor,
   useSensor,
   useSensors,
@@ -183,84 +183,66 @@ export default function ProjectPage() {
   };
 
   const handleDragEnd = async ({ active, over }: any) => {
-    try {
-      if (!over || !active) return;
+    if (!over) return;
 
-      const taskId = Number(active.id);
-      if (isNaN(taskId)) return;
+    const taskId = Number(active.id);
 
-      const taskStatusKeys = ["todo", "in_progress", "done"] as const;
-      type TaskStatus = (typeof taskStatusKeys)[number];
+    const taskStatusKeys = ["todo", "in_progress", "done"] as const;
+    type TaskStatus = (typeof taskStatusKeys)[number];
 
-      let newStatus: TaskStatus | undefined;
+    let newStatus: TaskStatus | undefined;
 
-      if (taskStatusKeys.includes(over.id as TaskStatus)) {
-        newStatus = over.id as TaskStatus;
-      } else {
-        newStatus = over.data?.current?.sortable?.containerId as TaskStatus | undefined;
-      }
+    if (taskStatusKeys.includes(over.id as TaskStatus)) {
+      newStatus = over.id as TaskStatus;
+    } else {
+      newStatus = over.data?.current?.sortable?.containerId as TaskStatus | undefined;
+    }
 
-      if (!newStatus || !taskStatusKeys.includes(newStatus)) return;
+    if (!newStatus) return;
 
-      // No-op if dropped in the same column
-      let currentStatus: TaskStatus | undefined;
+    setTasks((prev: any) => {
+      let moved: any = null;
+
+      const updated = {
+        todo: [...(prev.todo || [])],
+        in_progress: [...(prev.in_progress || [])],
+        done: [...(prev.done || [])],
+      };
+
       for (const key of taskStatusKeys) {
-        if (tasks[key].some((t: any) => t.id === taskId)) {
-          currentStatus = key;
-          break;
-        }
+        updated[key] = updated[key].filter((t: any) => {
+          if (t.id === taskId) {
+            moved = t;
+            return false;
+          }
+          return true;
+        });
       }
-      if (currentStatus === newStatus) return;
 
-      // Capture in a local const so the closure inside setTasks is safe
-      const targetStatus = newStatus;
+      if (moved && newStatus) {
+        updated[newStatus].push({
+          ...moved,
+          status: newStatus,
+        });
+      }
 
-      setTasks((prev: any) => {
-        let moved: any = null;
+      return updated;
+    });
 
-        const updated = {
-          todo: [...(prev.todo || [])],
-          in_progress: [...(prev.in_progress || [])],
-          done: [...(prev.done || [])],
-        };
-
-        for (const key of taskStatusKeys) {
-          updated[key] = updated[key].filter((t: any) => {
-            if (t.id === taskId) {
-              moved = t;
-              return false;
-            }
-            return true;
-          });
-        }
-
-        if (moved) {
-          updated[targetStatus].push({ ...moved, status: targetStatus });
-        }
-
-        return updated;
-      });
-
-      const res = await moveTask(id, taskId, targetStatus);
+    const res = await moveTask(id, taskId, newStatus);
 
       if (res?.error === "NOT_ALLOWED") {
-        setErrorMsg("You don't have permission to move this task");
-        await loadAll();
+        setErrorMsg("You don’t have permission to move this task");
+        loadAll();
         setTimeout(() => setErrorMsg(""), 2500);
         return;
       }
 
       if (res?.error) {
-        setErrorMsg("Something went wrong moving the task");
-        await loadAll();
+        setErrorMsg("Something went wrong");
+        loadAll();
         return;
       }
-    } catch (err: any) {
-      console.error("Error in handleDragEnd:", err);
-      setErrorMsg("Failed to move task");
-      await loadAll();
-      setTimeout(() => setErrorMsg(""), 2500);
-    }
   };
 
   const handleCreate = async () => {
@@ -333,7 +315,7 @@ export default function ProjectPage() {
         {/* BOARD */}
         <DndContext
           sensors={sensors}
-          collisionDetection={rectIntersection}
+          collisionDetection={closestCorners}
           onDragEnd={handleDragEnd}
         >
           <div className="kanban">
