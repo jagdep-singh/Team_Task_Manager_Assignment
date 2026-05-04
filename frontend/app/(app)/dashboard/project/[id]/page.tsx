@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   DndContext,
   closestCorners,
@@ -30,7 +30,6 @@ import {
 } from "@/lib/services/task";
 
 import "./project.css";
-import { useRouter } from "next/navigation";
 
 
 
@@ -104,9 +103,69 @@ export default function ProjectPage() {
     }
   };
 
+  const getCurrentUserEmail = () => {
+    const storedUser = localStorage.getItem("user");
+    if (!storedUser) return null;
+
+    try {
+      const parsed = JSON.parse(storedUser);
+      return parsed?.email || null;
+    } catch {
+      return storedUser.includes("@") ? storedUser : null;
+    }
+  };
+
   const handleAddMember = async (email: string) => {
-    await addMember(id, email);
-    loadAll();
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail) {
+      return { success: false, message: "Enter a valid email address." };
+    }
+
+    const alreadyMember = members.some(
+      (member: any) =>
+        member?.email?.toLowerCase() === normalizedEmail
+    );
+
+    if (alreadyMember) {
+      return {
+        success: false,
+        message: "This user is already a team member.",
+      };
+    }
+
+    const currentUserEmail = getCurrentUserEmail();
+
+    if (
+      currentUserEmail &&
+      currentUserEmail.toLowerCase() === normalizedEmail
+    ) {
+      return {
+        success: false,
+        message: "You can’t add yourself to the team.",
+      };
+    }
+
+    try {
+      const result = await addMember(id, email);
+
+      if (result?.error) {
+        return {
+          success: false,
+          message:
+            result?.error || "Could not add this member.",
+        };
+      }
+
+      await loadAll();
+      return { success: true };
+    } catch (err: any) {
+      return {
+        success: false,
+        message:
+          err?.message || "Could not add this member.",
+      };
+    }
   };
 
   const handlePriorityChange = (taskId: number, newPriority: string) => {

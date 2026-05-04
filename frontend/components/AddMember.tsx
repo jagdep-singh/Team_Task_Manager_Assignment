@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./AddMember.css";
 import Button from "./Button";
 
@@ -10,6 +10,27 @@ export default function AddMember({
   onAdd,
 }: any) {
   const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!open) {
+      setEmail("");
+      setError("");
+    }
+  }, [open]);
+
+  const handleAdd = async () => {
+    const result = await onAdd(email.trim());
+
+    if (result?.success) {
+      setEmail("");
+      setError("");
+      setOpen(false);
+      return;
+    }
+
+    setError(result?.message || "Could not add this member.");
+  };
 
   if (!open) return null;
 
@@ -27,19 +48,14 @@ export default function AddMember({
           onChange={(e) => setEmail(e.target.value)}
         />
 
+        {error && <div className="member-error">{error}</div>}
+
         <div className="member-actions">
           <Button variant="ghost" onClick={() => setOpen(false)}>
             Cancel
           </Button>
 
-          <Button
-            onClick={() => {
-              onAdd(email);
-              setEmail("");
-              setOpen(false);
-            }}
-            disabled={!email}
-          >
+          <Button onClick={handleAdd} disabled={!email.trim()}>
             Add
           </Button>
         </div>

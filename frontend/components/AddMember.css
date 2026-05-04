@@ -37,6 +37,12 @@
   outline: none;
 }
 
+.member-error {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
 .member-actions {
   display: flex;
   justify-content: flex-end;
