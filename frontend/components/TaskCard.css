@@ -62,6 +62,18 @@
   justify-content: space-between;
   font-size: 11px;
   color: #aaa;
+  gap: 8px;
+}
+
+.task-due {
+  font-size: 11px;
+  color: #4c4c5a;
+  background: rgba(230, 239, 255, 0.9);
+  border: 1px solid #dfe7f3;
+  border-radius: 999px;
+  padding: 4px 10px;
+  width: fit-content;
+  align-self: flex-start;
 }
 
 /* PRIORITY */
