@@ -1,36 +1,147 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend
+
+This is the frontend for the Ethara AI Team Task Manager, built with Next.js. It connects to a FastAPI backend and provides a clean, minimal interface for managing projects and tasks.
+
+---
+
+## Overview
+
+The app is designed as a collaborative task management system where users can:
+
+- Sign up and log in
+- Create and manage projects
+- Add and assign tasks within projects
+- Track task progress using a Kanban board
+- View basic dashboard stats
+
+The UI focuses on simplicity, clarity, and smooth interactions.
+
+---
+
+## Tech Stack
+
+- Next.js (App Router)
+- React
+- TypeScript
+- Custom CSS (modular component-based styling)
+- REST API integration with backend
+
+---
+
+## Features
+
+### Authentication
+- Login and Signup
+- JWT-based authentication
+- User data stored in localStorage (token, username)
+
+### Dashboard
+- View all projects
+- Create new projects using a modal
+- Project cards with creator info
+
+### Project Page
+- Kanban board (Todo / In Progress / Done)
+- Create tasks via modal
+- Assign tasks to users
+- Task details:
+  - Title
+  - Description
+  - Priority (clickable to change directly from the UI)
+  - Assigned user
+  - Created by
+  - Due date
+
+### UI System
+- Reusable Button component (primary, ghost, logout)
+- Floating navbar with avatar + username
+- Modal system (used for project/task creation)
+- Clean card-based layout
+
+---
+
+## Project Structure
+
+```
+app/
+  dashboard/
+    project/[id]/
+components/
+  Button.tsx / Button.css
+  Navbar.tsx / Navbar.css
+  Column.tsx / Column.css
+  TaskCard.tsx / TaskCard.css
+  ProjectCard.tsx / ProjectCard.css
+  CreateTask.tsx / CreateTask.css
+  Stats.tsx / Stats.css
+lib/
+  services/
+```
+
+---
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Environment Setup
 
-To learn more about Next.js, take a look at the following resources:
+Make sure your frontend is connected to the backend API.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Update your API base URL inside:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+/lib/services/
+```
 
-## Deploy on Vercel
+Example:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```ts
+const BASE_URL = "http://localhost:8000";
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Notes
+
+- Navbar reads username from localStorage
+- Avatar is generated using Dicebear based on username
+- Modals are used instead of inline forms for cleaner UI
+- Components are structured for scalability
+
+---
+
+## Deployment
+
+The frontend can be deployed on platforms like:
+
+- Vercel
+- Netlify
+- Railway (if using custom setup)
+
+Make sure environment variables and API URLs are configured correctly.
+
+---
+
+## Status
+
+Frontend is functional and connected to backend.  
+Currently focused on UI refinement, interaction improvements, and polishing user experience.
