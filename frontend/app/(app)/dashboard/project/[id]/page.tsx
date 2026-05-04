@@ -240,6 +240,10 @@ export default function ProjectPage() {
               View Team
             </Button>
 
+            <Button variant="ghost" onClick={() => setMemberOpen(true)}>
+              + Add Member
+            </Button>
+
             <Button onClick={() => setOpen(true)}>
               + Create Task
             </Button>
