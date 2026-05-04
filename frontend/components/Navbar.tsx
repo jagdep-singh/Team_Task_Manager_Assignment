@@ -8,9 +8,9 @@ export default function Navbar({ projectName }: any = {}) {
   const [username, setUsername] = useState("User");
 
   useEffect(() => {
-    const storedName = localStorage.getItem("username");
-    if (storedName) {
-      setUsername(storedName);
+    const storedUser = localStorage.getItem("user");
+    if (storedUser && storedUser !== "[object Object]") {
+      setUsername(storedUser);
     }
   }, []);
 

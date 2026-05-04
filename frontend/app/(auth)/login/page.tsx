@@ -35,7 +35,7 @@ export default function SignInPage() {
       const data = await res.json();
 
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("user", data.user?.name || data.user?.email || "User");
 
       router.replace("/dashboard");
     } catch (err: any) {
