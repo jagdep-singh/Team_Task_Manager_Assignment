@@ -1,16 +1,71 @@
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 0 24px 20px;
+}
+
 .stat {
   background: #fff;
   border-radius: 14px;
-  padding: 14px 16px;
+  padding: 14px 18px;
   border: 1px solid #eee;
+  min-width: 110px;
+  flex: 1;
 }
 
 .stat span {
   font-size: 11px;
   color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .stat h2 {
-  font-size: 22px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 4px 0 0;
+  color: #111;
+}
+
+/* Overdue card — red tint */
+.stat--overdue h2 {
+  color: #e53935;
+}
+
+/* Tasks per member card — spans full remaining width */
+.stat--wide {
+  flex: 100%;
+  min-width: unset;
+}
+
+.stat-per-user {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.stat-user-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: #f8f8f8;
+  border-radius: 8px;
+}
+
+.stat-user-name {
+  font-size: 13px;
+  color: #333;
+  font-weight: 500;
+}
+
+.stat-user-count {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111;
+  background: #efefef;
+  border-radius: 20px;
+  padding: 2px 10px;
 }
