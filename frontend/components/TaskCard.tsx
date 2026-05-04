@@ -1,28 +1,74 @@
-export default function TaskCard({ task, onMove }: any) {
+"use client";
+
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import "./TaskCard.css";
+
+const order = ["low", "medium", "high"];
+
+export default function TaskCard({
+  task,
+  onPriorityChange,
+}: any) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({
+    id: String(task.id),
+  });
+
+  const style = {
+    transform: transform ? CSS.Transform.toString(transform) : undefined,
+    transition,
+  };
+
+  const handlePriorityCycle = () => {
+    const currentIndex = order.indexOf(task.priority);
+    const next = order[(currentIndex + 1) % order.length];
+
+    onPriorityChange(task.id, next);
+  };
+
   return (
-    <div className="task-card">
-      <p><strong>{task.title}</strong></p>
-      <p>{task.description}</p>
-      <p>Assigned: {task.assigned_to?.name || "None"}</p>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="task-card"
+    >
+      {/* DRAG HANDLE */}
+      <div className="drag-handle" {...attributes} {...listeners}>
+        ⋮⋮
+      </div>
 
-      <div className="task-actions">
-        {task.status === "todo" && (
-          <button onClick={() => onMove(task.id, "in_progress")}>
-            → In Progress
-          </button>
+      {/* CONTENT */}
+      <div className="task-content">
+        <div className="task-top">
+          <h4 className="task-title">{task.title}</h4>
+
+          <span
+            className={`priority clickable ${task.priority}`}
+            onClick={handlePriorityCycle}
+          >
+            {task.priority}
+          </span>
+        </div>
+
+        {task.description && (
+          <p className="task-desc">{task.description}</p>
         )}
 
-        {task.status === "in_progress" && (
-          <>
-            <button onClick={() => onMove(task.id, "todo")}>← Todo</button>
-            <button onClick={() => onMove(task.id, "done")}>→ Done</button>
-          </>
-        )}
+        <div className="task-meta">
+          <span>{task.assigned_to?.name || "Unassigned"}</span>
+          <span>{task.created_by?.name}</span>
+        </div>
 
-        {task.status === "done" && (
-          <button onClick={() => onMove(task.id, "in_progress")}>
-            ← In Progress
-          </button>
+        {task.due_date && (
+          <div className="task-due">
+            Due {new Date(task.due_date).toDateString()}
+          </div>
         )}
       </div>
     </div>

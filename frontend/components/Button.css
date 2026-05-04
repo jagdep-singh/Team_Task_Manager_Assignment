@@ -1,0 +1,87 @@
+/* BASE */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+
+  font-size: 13px;
+  font-weight: 500;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  letter-spacing: -0.1px;
+
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.btn:active {
+  opacity: 0.75;
+}
+
+/* PRIMARY */
+.btn-primary {
+  background: #18181b;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #27272a;
+}
+
+/* SECONDARY */
+.btn-secondary {
+  background: #f4f4f5;
+  color: #18181b;
+  border: 1px solid #e4e4e7;
+}
+
+.btn-secondary:hover {
+  background: #ececee;
+}
+
+/* GHOST */
+.btn-ghost {
+  background: transparent;
+  color: #71717a;
+  border: 1px solid #e4e4e7;
+}
+
+.btn-ghost:hover {
+  background: #f4f4f5;
+  color: #18181b;
+}
+
+/* DISABLED */
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* LOGOUT */
+.btn-logout {
+  background: transparent;
+  color: #71717a;
+  border: 1px solid #e4e4e7;
+
+  padding: 8px 16px;
+  border-radius: 8px;
+
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.1px;
+
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.btn-logout:hover {
+  background: #fff1f0;
+  color: #ef4444;
+  border-color: #fecaca;
+}
+
+.btn-logout:active {
+  opacity: 0.75;
+}

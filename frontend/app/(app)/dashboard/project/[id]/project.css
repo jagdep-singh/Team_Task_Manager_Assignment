@@ -1,0 +1,134 @@
+.project-page {
+  padding: -16px 32px; /* was 32px on all sides */
+  max-width: 1100px;
+  margin: -16px auto;
+}
+
+/* HEADER */
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.task-header h1 {
+  font-size: 48px;
+  font-weight: 600;
+}
+
+.task-sub {
+  font-size: 13px;
+  color: #888;
+}
+
+/* STATS */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat {
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px;
+  border: 1px solid #eee;
+}
+
+/* KANBAN */
+.kanban {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* COLUMN */
+.column {
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px;
+  border: 1px solid #eee;
+
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.column-tasks {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* TEAM MODAL */
+.team-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.2);
+  backdrop-filter: blur(6px);
+}
+
+.team-modal {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  width: 400px;
+}
+
+.team-modal table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.team-modal td,
+.team-modal th {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.role-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  text-transform: capitalize;
+}
+
+/* admin */
+.role-badge.admin {
+  background: #111;
+  color: white;
+}
+
+/* member */
+.role-badge.member {
+  background: #eee;
+  color: #555;
+}
+
+.task-header-left {
+  display: flex;
+  flex-direction: column;  
+  align-items: flex-start; 
+  gap: 8px;                
+}
+
+.back-btn {
+  border: none;
+  background: #f2f2f5;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #555;
+  transition: all 0.15s ease;
+}
+
+.back-btn:hover {
+  background: #e6e6eb;
+}

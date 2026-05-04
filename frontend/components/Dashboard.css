@@ -1,0 +1,42 @@
+/* create task */
+.create-task {
+  margin-bottom: 30px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* stats */
+.stats {
+  margin-bottom: 30px;
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 10px;
+}
+
+/* create project */
+.create-project {
+  margin-bottom: 30px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* project list */
+.project-list {
+  display: grid;
+  gap: 16px;
+}
+
+.project-card {
+  padding: 16px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  background: #fafafa;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.project-card:hover {
+  border-color: #ccc;
+}

@@ -1,0 +1,63 @@
+.column {
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px;
+  border: 1px solid #eee;
+
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+.column-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+/* title row */
+.column-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* title */
+.column-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+}
+
+/* count */
+.column-count {
+  font-size: 12px;
+  color: #999;
+}
+
+/* subtle divider */
+.column-divider {
+  height: 1px;
+  background: #f0f0f0;
+  margin-top: 8px;
+}
+
+/* TASK LIST */
+.column-tasks {
+  flex: 1;
+  overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* EMPTY STATE */
+.column-empty {
+  font-size: 12px;
+  color: #bbb;
+  text-align: center;
+  padding: 20px 0;
+}

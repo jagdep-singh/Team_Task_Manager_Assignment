@@ -1,0 +1,16 @@
+.stat {
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px 16px;
+  border: 1px solid #eee;
+}
+
+.stat span {
+  font-size: 11px;
+  color: #888;
+}
+
+.stat h2 {
+  font-size: 22px;
+  font-weight: 600;
+}

@@ -1,0 +1,108 @@
+/* NAVBAR */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 96%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 20px 40px;
+
+  background: transparent;
+  z-index: 100;
+}
+
+/* LEFT */
+.nav-left h1 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 400;
+  font-family: "Satoshi", sans-serif;
+  font-style: normal;
+}
+
+/* RIGHT */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* AVATAR */
+.avatar-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.avatar-img {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 1px solid #eee;
+  transition: transform 0.2s ease;
+}
+
+.avatar-img:hover {
+  transform: scale(1.05);
+}
+
+/* NAME (slides from avatar to left) */
+.avatar-name {
+  position: absolute;
+  top: 50%;
+  right: 42px;
+
+  transform: translateY(-50%) translateX(8px);
+  opacity: 0;
+
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+
+  transition: all 0.25s ease;
+}
+
+.avatar-wrapper:hover .avatar-name {
+  transform: translateY(-50%) translateX(0);
+  opacity: 1;
+}
+
+/* UNDERLINES */
+
+/* LEFT underline */
+.nav-left {
+  position: relative;
+}
+
+.nav-left::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+
+  width: 60%;
+  height: 1px;
+  background: #e5e5e5;
+}
+
+/* RIGHT underline */
+.nav-right {
+  position: relative;
+}
+
+.nav-right::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  right: 0;
+
+  width: 100%;
+  height: 1px;
+  background: #e5e5e5;
+}
